@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { machines, queues, registerMachine, occupySlot, releaseSlot } from '$lib/stores/queueStore';
+	import { showNotification } from '$lib/stores/notificationStore';
 	import MachineRow from '$lib/components/MachineRow.svelte';
+	import Notifications from '$lib/components/Notifications.svelte';
 	import { onMount } from 'svelte';
 
 	let slotInput = '';
@@ -16,27 +18,33 @@
 
 	function handleOccupySlot() {
 		if (!slotInput.trim()) {
-			alert('Please enter a slot ID (e.g., A3)');
+			showNotification('Please enter a slot ID (e.g., A3)', 'warning');
 			return;
 		}
 
 		if (selectedMachines.length === 0) {
-			alert('Please select at least one machine');
+			showNotification('Please select at least one machine', 'warning');
 			return;
 		}
 
-		occupySlot(slotInput.trim().toUpperCase(), selectedMachines);
-		slotInput = '';
-		selectedMachines = [];
+		const success = occupySlot(slotInput.trim().toUpperCase(), selectedMachines);
+		if (success) {
+			showNotification(`Slot ${slotInput.trim().toUpperCase()} occupied successfully!`, 'success');
+			slotInput = '';
+			selectedMachines = [];
+		} else {
+			showNotification(`Slot ${slotInput.trim().toUpperCase()} is already occupied`, 'error');
+		}
 	}
 
 	function handleReleaseSlot() {
 		if (!slotInput.trim()) {
-			alert('Please enter a slot ID to release');
+			showNotification('Please enter a slot ID to release', 'warning');
 			return;
 		}
 
 		releaseSlot(slotInput.trim().toUpperCase());
+		showNotification(`Slot ${slotInput.trim().toUpperCase()} released successfully!`, 'success');
 		slotInput = '';
 	}
 
@@ -54,6 +62,8 @@
 </svelte:head>
 
 <div class="app-container">
+	<Notifications />
+	
 	<header class="app-header">
 		<div class="header-content">
 			<h1 class="app-title">🎮 NearCards Queue System</h1>

@@ -4,6 +4,8 @@
 	export let player: Player;
 	export let onLongPress: () => void = () => {};
 
+	const LONG_PRESS_DURATION = 1000; // milliseconds
+
 	let pressTimer: ReturnType<typeof setTimeout> | null = null;
 	let pressing = false;
 
@@ -13,7 +15,7 @@
 			if (pressing && player.status === 'playing') {
 				onLongPress();
 			}
-		}, 1000); // 1 second long press
+		}, LONG_PRESS_DURATION);
 	}
 
 	function handleMouseUp() {

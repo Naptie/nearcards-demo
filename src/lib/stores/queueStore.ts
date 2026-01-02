@@ -36,7 +36,7 @@ export function findShortestQueue(machineIds: string[]): string | null {
 
 	for (const machineId of machineIds) {
 		const queue = allQueues.find(q => q.machineId === machineId);
-		const queueLength = queue ? queue.players.filter(p => p.status === 'queued').length : 0;
+		const queueLength = queue ? queue.players.length : 0;
 		
 		if (queueLength < shortestLength) {
 			shortestLength = queueLength;
@@ -66,25 +66,31 @@ export function registerMachine(machine: Machine) {
 }
 
 // Notify that a slot has been occupied
-export function occupySlot(slotId: string, machineIds: string[]) {
+export function occupySlot(slotId: string, machineIds: string[]): boolean {
 	const slots = get(occupiedSlots);
 	
 	// Check if slot is already occupied
 	if (slots.has(slotId)) {
-		return;
+		return false;
+	}
+
+	// Validate machine IDs
+	if (machineIds.length === 0) {
+		return false;
 	}
 
 	// Mark slot as occupied
 	occupiedSlots.update(s => {
-		s.add(slotId);
-		return s;
+		const newSet = new Set(s);
+		newSet.add(slotId);
+		return newSet;
 	});
 
 	// Find the best (shortest) queue
 	const bestMachineId = findShortestQueue(machineIds);
 	
 	if (!bestMachineId) {
-		return;
+		return false;
 	}
 
 	// Add player to the selected queue
@@ -110,6 +116,8 @@ export function occupySlot(slotId: string, machineIds: string[]) {
 			return queue;
 		});
 	});
+
+	return true;
 }
 
 // Release a slot (remove player from all queues)
@@ -122,8 +130,9 @@ export function releaseSlot(slotId: string) {
 
 	// Remove from occupied slots
 	occupiedSlots.update(s => {
-		s.delete(slotId);
-		return s;
+		const newSet = new Set(s);
+		newSet.delete(slotId);
+		return newSet;
 	});
 
 	// Remove player from all queues and promote next player if necessary
