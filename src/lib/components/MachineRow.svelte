@@ -7,24 +7,26 @@
 	export let queue: Queue;
 </script>
 
-<div class="machine-row">
-	<div class="machine-info">
-		<div class="machine-icon">
+<div class="flex items-center p-6 bg-gradient-to-r from-blue-900/50 to-purple-900/50 backdrop-blur-lg rounded-2xl shadow-xl border border-white/10 hover:-translate-y-1 transition-all duration-300 animate-fade-in">
+	<!-- Machine Info -->
+	<div class="flex items-center min-w-[280px] pr-6 border-r border-white/20">
+		<div class="w-20 h-20 flex items-center justify-center text-5xl bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl shadow-lg animate-float mr-4">
 			{machine.icon}
 		</div>
-		<div class="machine-details">
-			<div class="machine-name">{machine.name}</div>
-			<div class="machine-stats">
+		<div class="text-white">
+			<div class="text-2xl font-bold mb-1">{machine.name}</div>
+			<div class="text-sm text-gray-300">
 				{queue.players.length} player{queue.players.length !== 1 ? 's' : ''}
 			</div>
 		</div>
 	</div>
 	
-	<div class="queue-container">
+	<!-- Queue Container -->
+	<div class="flex-1 pl-6 overflow-x-auto scrollbar-thin scrollbar-thumb-white/30 scrollbar-track-white/10">
 		{#if queue.players.length === 0}
-			<div class="empty-queue">No players in queue</div>
+			<div class="text-gray-400 italic py-6 text-center">No players in queue</div>
 		{:else}
-			<div class="players-list">
+			<div class="flex items-center gap-3">
 				{#each queue.players as player (player.slotId)}
 					<PlayerSlot
 						{player}
@@ -37,19 +39,7 @@
 </div>
 
 <style>
-	.machine-row {
-		display: flex;
-		align-items: center;
-		padding: 20px;
-		margin: 16px 0;
-		background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-		border-radius: 16px;
-		box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-		transition: all 0.3s ease;
-		animation: fadeIn 0.5s ease-out;
-	}
-
-	@keyframes fadeIn {
+	@keyframes fade-in {
 		from {
 			opacity: 0;
 			transform: translateY(20px);
@@ -60,34 +50,7 @@
 		}
 	}
 
-	.machine-row:hover {
-		transform: translateY(-4px);
-		box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
-	}
-
-	.machine-info {
-		display: flex;
-		align-items: center;
-		min-width: 280px;
-		padding-right: 24px;
-		border-right: 2px solid rgba(255, 255, 255, 0.2);
-	}
-
-	.machine-icon {
-		font-size: 48px;
-		width: 80px;
-		height: 80px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-		border-radius: 16px;
-		margin-right: 16px;
-		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-		animation: iconFloat 3s ease-in-out infinite;
-	}
-
-	@keyframes iconFloat {
+	@keyframes float {
 		0%, 100% {
 			transform: translateY(0);
 		}
@@ -96,57 +59,30 @@
 		}
 	}
 
-	.machine-details {
-		color: white;
+	.animate-fade-in {
+		animation: fade-in 0.5s ease-out;
 	}
 
-	.machine-name {
-		font-size: 24px;
-		font-weight: bold;
-		margin-bottom: 4px;
-		text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+	.animate-float {
+		animation: float 3s ease-in-out infinite;
 	}
 
-	.machine-stats {
-		font-size: 14px;
-		color: rgba(255, 255, 255, 0.8);
-	}
-
-	.queue-container {
-		flex: 1;
-		padding-left: 24px;
-		overflow-x: auto;
-	}
-
-	.players-list {
-		display: flex;
-		align-items: center;
-		gap: 8px;
-	}
-
-	.empty-queue {
-		color: rgba(255, 255, 255, 0.6);
-		font-style: italic;
-		padding: 24px;
-		text-align: center;
-	}
-
-	/* Custom scrollbar */
-	.queue-container::-webkit-scrollbar {
+	/* Custom scrollbar styles */
+	.scrollbar-thin::-webkit-scrollbar {
 		height: 8px;
 	}
 
-	.queue-container::-webkit-scrollbar-track {
+	.scrollbar-track-white\/10::-webkit-scrollbar-track {
 		background: rgba(255, 255, 255, 0.1);
 		border-radius: 4px;
 	}
 
-	.queue-container::-webkit-scrollbar-thumb {
+	.scrollbar-thumb-white\/30::-webkit-scrollbar-thumb {
 		background: rgba(255, 255, 255, 0.3);
 		border-radius: 4px;
 	}
 
-	.queue-container::-webkit-scrollbar-thumb:hover {
+	.scrollbar-thumb-white\/30::-webkit-scrollbar-thumb:hover {
 		background: rgba(255, 255, 255, 0.5);
 	}
 </style>

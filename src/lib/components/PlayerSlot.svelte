@@ -32,8 +32,9 @@
 </script>
 
 <div
-	class="player-slot {player.status}"
-	class:pressing
+	class="relative flex flex-col items-center justify-center w-20 h-20 rounded-xl cursor-pointer select-none transition-all duration-300 {player.status === 'playing'
+		? 'bg-gradient-to-br from-pink-500 to-rose-600 shadow-lg shadow-pink-500/50 animate-pulse-playing'
+		: 'bg-gradient-to-br from-purple-600 to-indigo-700 shadow-md'} {pressing ? 'scale-95' : 'hover:scale-110'} animate-slide-in"
 	on:mousedown={handleMouseDown}
 	on:mouseup={handleMouseUp}
 	on:mouseleave={handleMouseLeave}
@@ -44,29 +45,12 @@
 	tabindex="0"
 	title={player.status === 'playing' ? 'Long press to move to end of queue' : 'In queue'}
 >
-	<div class="slot-id">{player.slotId}</div>
-	<div class="status-indicator"></div>
+	<div class="text-2xl font-bold text-white drop-shadow-lg">{player.slotId}</div>
+	<div class="absolute top-2 right-2 w-3 h-3 rounded-full bg-white/80 {player.status === 'playing' ? 'animate-blink' : ''}"></div>
 </div>
 
 <style>
-	.player-slot {
-		position: relative;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		width: 80px;
-		height: 80px;
-		border-radius: 12px;
-		margin: 0 8px;
-		cursor: pointer;
-		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-		user-select: none;
-		animation: slideIn 0.4s ease-out;
-	}
-
-	@keyframes slideIn {
+	@keyframes slide-in {
 		from {
 			opacity: 0;
 			transform: translateX(-20px) scale(0.8);
@@ -77,60 +61,13 @@
 		}
 	}
 
-	.player-slot.queued {
-		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-		color: white;
-	}
-
-	.player-slot.playing {
-		background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-		color: white;
-		box-shadow: 0 0 20px rgba(245, 87, 108, 0.6), 0 4px 6px rgba(0, 0, 0, 0.1);
-		animation: pulse 2s ease-in-out infinite, slideIn 0.4s ease-out;
-	}
-
-	@keyframes pulse {
+	@keyframes pulse-playing {
 		0%, 100% {
-			box-shadow: 0 0 20px rgba(245, 87, 108, 0.6), 0 4px 6px rgba(0, 0, 0, 0.1);
+			box-shadow: 0 0 20px rgba(236, 72, 153, 0.6), 0 4px 6px rgba(0, 0, 0, 0.1);
 		}
 		50% {
-			box-shadow: 0 0 30px rgba(245, 87, 108, 0.8), 0 6px 10px rgba(0, 0, 0, 0.15);
+			box-shadow: 0 0 30px rgba(236, 72, 153, 0.8), 0 6px 10px rgba(0, 0, 0, 0.15);
 		}
-	}
-
-	.player-slot.pressing {
-		transform: scale(0.95);
-		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-	}
-
-	.player-slot:hover {
-		transform: scale(1.05);
-		box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-	}
-
-	.player-slot.pressing:hover {
-		transform: scale(0.95);
-	}
-
-	.slot-id {
-		font-size: 24px;
-		font-weight: bold;
-		font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-		text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-	}
-
-	.status-indicator {
-		position: absolute;
-		top: 8px;
-		right: 8px;
-		width: 12px;
-		height: 12px;
-		border-radius: 50%;
-		background: rgba(255, 255, 255, 0.8);
-	}
-
-	.playing .status-indicator {
-		animation: blink 1s ease-in-out infinite;
 	}
 
 	@keyframes blink {
@@ -140,5 +77,17 @@
 		50% {
 			opacity: 0.3;
 		}
+	}
+
+	.animate-slide-in {
+		animation: slide-in 0.4s ease-out;
+	}
+
+	.animate-pulse-playing {
+		animation: pulse-playing 2s ease-in-out infinite;
+	}
+
+	.animate-blink {
+		animation: blink 1s ease-in-out infinite;
 	}
 </style>

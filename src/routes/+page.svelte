@@ -61,68 +61,93 @@
 	<title>NearCards Queue Management</title>
 </svelte:head>
 
-<div class="app-container">
+<div class="min-h-screen flex flex-col">
 	<Notifications />
 	
-	<header class="app-header">
-		<div class="header-content">
-			<h1 class="app-title">🎮 NearCards Queue System</h1>
-			<p class="app-subtitle">Self-Service Kiosk Management</p>
+	<!-- Header with gradient -->
+	<header class="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 shadow-xl">
+		<div class="max-w-7xl mx-auto px-6 py-8 animate-fade-in">
+			<h1 class="text-5xl font-bold text-white mb-2 flex items-center gap-3">
+				<span class="text-6xl animate-bounce">🎮</span>
+				NearCards Queue System
+			</h1>
+			<p class="text-purple-100 text-lg">Self-Service Kiosk Management</p>
 		</div>
 	</header>
 
-	<div class="content">
-		<!-- Control Panel -->
-		<div class="control-panel">
-			<h2>Slot Control</h2>
+	<main class="flex-1 max-w-7xl w-full mx-auto px-6 py-8">
+		<!-- Control Panel Card -->
+		<div class="bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl p-6 mb-8 border border-white/20">
+			<h2 class="text-3xl font-bold text-white mb-6">Slot Control</h2>
 			
-			<div class="input-group">
-				<label for="slot-input">Slot ID:</label>
+			<!-- Input Group -->
+			<div class="mb-6">
+				<label for="slot-input" class="block text-sm font-semibold text-gray-200 mb-2">
+					Slot ID
+				</label>
 				<input
 					id="slot-input"
 					type="text"
 					bind:value={slotInput}
 					placeholder="e.g., A3, B5, C1"
-					class="slot-input"
+					class="py-3 px-4 block w-full max-w-md bg-white/10 border-2 border-gray-500/30 rounded-lg text-lg text-white placeholder-gray-400 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 transition-all duration-200"
 				/>
 			</div>
 
-			<div class="machine-selection">
-				<label>Select Machine(s):</label>
-				<div class="machine-buttons">
+			<!-- Machine Selection -->
+			<div class="mb-6">
+				<span class="block text-sm font-semibold text-gray-200 mb-3">Select Machine(s)</span>
+				<div class="flex flex-wrap gap-3">
 					{#each $machines as machine}
 						<button
-							class="machine-btn"
-							class:selected={selectedMachines.includes(machine.id)}
+							type="button"
 							on:click={() => toggleMachine(machine.id)}
+							class="py-3 px-6 inline-flex items-center gap-3 rounded-xl text-base font-semibold transition-all duration-200 {selectedMachines.includes(machine.id)
+								? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/50 scale-105'
+								: 'bg-white/10 border-2 border-gray-500/30 text-white hover:bg-white/20 hover:scale-105'}"
 						>
-							<span class="machine-btn-icon">{machine.icon}</span>
-							<span class="machine-btn-name">{machine.name}</span>
+							<span class="text-2xl">{machine.icon}</span>
+							<span>{machine.name}</span>
 						</button>
 					{/each}
 				</div>
 			</div>
 
-			<div class="action-buttons">
-				<button class="btn btn-primary" on:click={handleOccupySlot}>
+			<!-- Action Buttons -->
+			<div class="flex flex-wrap gap-3">
+				<button
+					type="button"
+					on:click={handleOccupySlot}
+					class="py-3 px-8 inline-flex justify-center items-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-lg font-semibold hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-4 focus:ring-purple-500/50 transition-all duration-200 shadow-lg hover:scale-105"
+				>
+					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+					</svg>
 					Occupy Slot
 				</button>
-				<button class="btn btn-danger" on:click={handleReleaseSlot}>
+				<button
+					type="button"
+					on:click={handleReleaseSlot}
+					class="py-3 px-8 inline-flex justify-center items-center gap-2 rounded-xl bg-gradient-to-r from-red-600 to-pink-600 text-white text-lg font-semibold hover:from-red-700 hover:to-pink-700 focus:outline-none focus:ring-4 focus:ring-red-500/50 transition-all duration-200 shadow-lg hover:scale-105"
+				>
+					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+					</svg>
 					Release Slot
 				</button>
 			</div>
 		</div>
 
 		<!-- Queue Display -->
-		<div class="queue-display">
-			<h2>Active Queues</h2>
+		<div class="animate-fade-in-up">
+			<h2 class="text-3xl font-bold text-white mb-6">Active Queues</h2>
 			
 			{#if $machines.length === 0}
-				<div class="empty-state">
-					<p>No machines registered yet.</p>
+				<div class="bg-white/5 backdrop-blur rounded-2xl p-12 text-center border border-white/10">
+					<p class="text-gray-400 text-lg">No machines registered yet.</p>
 				</div>
 			{:else}
-				<div class="machines-list">
+				<div class="space-y-4">
 					{#each $machines as machine}
 						{@const queue = $queues.find(q => q.machineId === machine.id)}
 						{#if queue}
@@ -132,40 +157,19 @@
 				</div>
 			{/if}
 		</div>
-	</div>
+	</main>
 
-	<footer class="app-footer">
-		<p>Long press on a playing player to move them to the end of the queue</p>
+	<!-- Footer -->
+	<footer class="bg-black/30 backdrop-blur py-4 text-center">
+		<p class="text-gray-400 text-sm">Long press on a playing player to move them to the end of the queue</p>
 	</footer>
 </div>
 
 <style>
-	:global(body) {
-		margin: 0;
-		padding: 0;
-		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-		background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
-		min-height: 100vh;
-		color: white;
-	}
-
-	.app-container {
-		min-height: 100vh;
-		display: flex;
-		flex-direction: column;
-	}
-
-	.app-header {
-		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-		padding: 32px 24px;
-		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-		animation: slideDown 0.5s ease-out;
-	}
-
-	@keyframes slideDown {
+	@keyframes fade-in {
 		from {
 			opacity: 0;
-			transform: translateY(-20px);
+			transform: translateY(-10px);
 		}
 		to {
 			opacity: 1;
@@ -173,215 +177,22 @@
 		}
 	}
 
-	.header-content {
-		max-width: 1400px;
-		margin: 0 auto;
-	}
-
-	.app-title {
-		margin: 0;
-		font-size: 48px;
-		font-weight: bold;
-		text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-		animation: glow 2s ease-in-out infinite;
-	}
-
-	@keyframes glow {
-		0%, 100% {
-			text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3), 0 0 10px rgba(255, 255, 255, 0.3);
-		}
-		50% {
-			text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3), 0 0 20px rgba(255, 255, 255, 0.5);
-		}
-	}
-
-	.app-subtitle {
-		margin: 8px 0 0 0;
-		font-size: 18px;
-		opacity: 0.9;
-	}
-
-	.content {
-		flex: 1;
-		max-width: 1400px;
-		width: 100%;
-		margin: 0 auto;
-		padding: 24px;
-	}
-
-	.control-panel {
-		background: rgba(255, 255, 255, 0.1);
-		border-radius: 16px;
-		padding: 24px;
-		margin-bottom: 32px;
-		backdrop-filter: blur(10px);
-		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-		animation: fadeIn 0.6s ease-out;
-	}
-
-	@keyframes fadeIn {
+	@keyframes fade-in-up {
 		from {
 			opacity: 0;
-			transform: scale(0.95);
+			transform: translateY(20px);
 		}
 		to {
 			opacity: 1;
-			transform: scale(1);
+			transform: translateY(0);
 		}
 	}
 
-	.control-panel h2 {
-		margin-top: 0;
-		margin-bottom: 20px;
-		font-size: 28px;
+	.animate-fade-in {
+		animation: fade-in 0.5s ease-out;
 	}
 
-	.input-group {
-		margin-bottom: 20px;
-	}
-
-	.input-group label {
-		display: block;
-		margin-bottom: 8px;
-		font-size: 16px;
-		font-weight: 600;
-	}
-
-	.slot-input {
-		width: 100%;
-		max-width: 300px;
-		padding: 12px 16px;
-		font-size: 18px;
-		border: 2px solid rgba(255, 255, 255, 0.3);
-		border-radius: 8px;
-		background: rgba(255, 255, 255, 0.1);
-		color: white;
-		transition: all 0.3s ease;
-	}
-
-	.slot-input:focus {
-		outline: none;
-		border-color: #667eea;
-		box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
-	}
-
-	.slot-input::placeholder {
-		color: rgba(255, 255, 255, 0.5);
-	}
-
-	.machine-selection {
-		margin-bottom: 20px;
-	}
-
-	.machine-selection label {
-		display: block;
-		margin-bottom: 12px;
-		font-size: 16px;
-		font-weight: 600;
-	}
-
-	.machine-buttons {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 12px;
-	}
-
-	.machine-btn {
-		display: flex;
-		align-items: center;
-		gap: 8px;
-		padding: 12px 20px;
-		background: rgba(255, 255, 255, 0.1);
-		border: 2px solid rgba(255, 255, 255, 0.3);
-		border-radius: 12px;
-		color: white;
-		font-size: 16px;
-		cursor: pointer;
-		transition: all 0.3s ease;
-	}
-
-	.machine-btn:hover {
-		background: rgba(255, 255, 255, 0.2);
-		transform: translateY(-2px);
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-	}
-
-	.machine-btn.selected {
-		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-		border-color: #667eea;
-		box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-	}
-
-	.machine-btn-icon {
-		font-size: 24px;
-	}
-
-	.action-buttons {
-		display: flex;
-		gap: 12px;
-		flex-wrap: wrap;
-	}
-
-	.btn {
-		padding: 14px 32px;
-		font-size: 18px;
-		font-weight: 600;
-		border: none;
-		border-radius: 12px;
-		cursor: pointer;
-		transition: all 0.3s ease;
-		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-	}
-
-	.btn:hover {
-		transform: translateY(-2px);
-		box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
-	}
-
-	.btn:active {
-		transform: translateY(0);
-	}
-
-	.btn-primary {
-		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-		color: white;
-	}
-
-	.btn-danger {
-		background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
-		color: white;
-	}
-
-	.queue-display {
-		animation: fadeIn 0.7s ease-out;
-	}
-
-	.queue-display h2 {
-		margin-top: 0;
-		margin-bottom: 24px;
-		font-size: 32px;
-	}
-
-	.machines-list {
-		display: flex;
-		flex-direction: column;
-		gap: 16px;
-	}
-
-	.empty-state {
-		background: rgba(255, 255, 255, 0.1);
-		border-radius: 16px;
-		padding: 48px;
-		text-align: center;
-		font-size: 18px;
-		color: rgba(255, 255, 255, 0.6);
-	}
-
-	.app-footer {
-		background: rgba(0, 0, 0, 0.3);
-		padding: 16px;
-		text-align: center;
-		color: rgba(255, 255, 255, 0.6);
-		font-size: 14px;
+	.animate-fade-in-up {
+		animation: fade-in-up 0.7s ease-out;
 	}
 </style>
