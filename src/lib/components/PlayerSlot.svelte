@@ -33,8 +33,8 @@
 
 <div
 	class="relative flex flex-col items-center justify-center w-20 h-20 rounded-xl cursor-pointer select-none transition-all duration-300 {player.status === 'playing'
-		? 'bg-gradient-to-br from-pink-500 to-rose-600 shadow-lg shadow-pink-500/50 animate-pulse-playing'
-		: 'bg-gradient-to-br from-purple-600 to-indigo-700 shadow-md'} {pressing ? 'scale-95' : 'hover:scale-110'} animate-slide-in"
+		? 'bg-linear-to-br from-pink-500 to-rose-600 shadow-lg shadow-pink-500/50 animate-pulse-playing'
+		: 'bg-linear-to-br from-purple-600 to-indigo-700 shadow-md'} {pressing ? 'scale-95' : 'hover:scale-110'} animate-slide-in"
 	on:mousedown={handleMouseDown}
 	on:mouseup={handleMouseUp}
 	on:mouseleave={handleMouseLeave}

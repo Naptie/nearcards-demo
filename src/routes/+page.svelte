@@ -10,10 +10,10 @@
 
 	// Register some demo machines on mount
 	onMount(() => {
-		registerMachine({ id: 'machine-1', name: 'Switch Zone', icon: '🎮' });
-		registerMachine({ id: 'machine-2', name: 'PlayStation Station', icon: '🕹️' });
-		registerMachine({ id: 'machine-3', name: 'Xbox Arena', icon: '🎯' });
-		registerMachine({ id: 'machine-4', name: 'PC Gaming Lab', icon: '💻' });
+		registerMachine({ id: 'machine-1', name: 'maimai DX', icon: '🎮' });
+		registerMachine({ id: 'machine-2', name: 'maimai DX', icon: '🕹️' });
+		registerMachine({ id: 'machine-3', name: 'CHUNITHM', icon: '🎯' });
+		registerMachine({ id: 'machine-4', name: 'CHUNITHM', icon: '💻' });
 	});
 
 	function handleOccupySlot() {
@@ -58,18 +58,18 @@
 </script>
 
 <svelte:head>
-	<title>NearCards Queue Management</title>
+	<title>nearcards</title>
 </svelte:head>
 
 <div class="min-h-screen flex flex-col">
 	<Notifications />
 	
 	<!-- Header with gradient -->
-	<header class="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 shadow-xl">
+	<header class="bg-linear-to-r from-indigo-600 via-purple-600 to-pink-600 shadow-xl">
 		<div class="max-w-7xl mx-auto px-6 py-8 animate-fade-in">
 			<h1 class="text-5xl font-bold text-white mb-2 flex items-center gap-3">
 				<span class="text-6xl animate-bounce">🎮</span>
-				NearCards Queue System
+				nearcards
 			</h1>
 			<p class="text-purple-100 text-lg">Self-Service Kiosk Management</p>
 		</div>
@@ -103,7 +103,7 @@
 							type="button"
 							on:click={() => toggleMachine(machine.id)}
 							class="py-3 px-6 inline-flex items-center gap-3 rounded-xl text-base font-semibold transition-all duration-200 {selectedMachines.includes(machine.id)
-								? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/50 scale-105'
+								? 'bg-linear-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/50 scale-105'
 								: 'bg-white/10 border-2 border-gray-500/30 text-white hover:bg-white/20 hover:scale-105'}"
 						>
 							<span class="text-2xl">{machine.icon}</span>
@@ -118,7 +118,7 @@
 				<button
 					type="button"
 					on:click={handleOccupySlot}
-					class="py-3 px-8 inline-flex justify-center items-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-lg font-semibold hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-4 focus:ring-purple-500/50 transition-all duration-200 shadow-lg hover:scale-105"
+					class="py-3 px-8 inline-flex justify-center items-center gap-2 rounded-xl bg-linear-to-r from-purple-600 to-indigo-600 text-white text-lg font-semibold hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-4 focus:ring-purple-500/50 transition-all duration-200 shadow-lg hover:scale-105"
 				>
 					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -128,7 +128,7 @@
 				<button
 					type="button"
 					on:click={handleReleaseSlot}
-					class="py-3 px-8 inline-flex justify-center items-center gap-2 rounded-xl bg-gradient-to-r from-red-600 to-pink-600 text-white text-lg font-semibold hover:from-red-700 hover:to-pink-700 focus:outline-none focus:ring-4 focus:ring-red-500/50 transition-all duration-200 shadow-lg hover:scale-105"
+					class="py-3 px-8 inline-flex justify-center items-center gap-2 rounded-xl bg-linear-to-r from-red-600 to-pink-600 text-white text-lg font-semibold hover:from-red-700 hover:to-pink-700 focus:outline-none focus:ring-4 focus:ring-red-500/50 transition-all duration-200 shadow-lg hover:scale-105"
 				>
 					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -158,11 +158,6 @@
 			{/if}
 		</div>
 	</main>
-
-	<!-- Footer -->
-	<footer class="bg-black/30 backdrop-blur py-4 text-center">
-		<p class="text-gray-400 text-sm">Long press on a playing player to move them to the end of the queue</p>
-	</footer>
 </div>
 
 <style>
