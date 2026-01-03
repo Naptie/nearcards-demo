@@ -1,193 +1,259 @@
 <script lang="ts">
-	import { machines, queues, registerMachine, occupySlot, releaseSlot } from '$lib/stores/queueStore';
-	import { showNotification } from '$lib/stores/notificationStore';
-	import MachineRow from '$lib/components/MachineRow.svelte';
-	import Notifications from '$lib/components/Notifications.svelte';
-	import { onMount } from 'svelte';
+import { machines, queues, registerMachine, occupySlot, releaseSlot, type SessionMode } from '$lib/stores/queueStore';
+import { showNotification } from '$lib/stores/notificationStore';
+import MachineRow from '$lib/components/MachineRow.svelte';
+import Notifications from '$lib/components/Notifications.svelte';
+import { onMount } from 'svelte';
 
-	let slotInput = '';
-	let selectedMachines: string[] = [];
+let slotInput = '';
+let selectedMachines: string[] = [];
+let sessionMode: SessionMode = 'SOLO';
+let partnerSlotInput = '';
+let showPartnerInput = false;
 
-	// Register some demo machines on mount
-	onMount(() => {
-		registerMachine({ id: 'machine-1', name: 'maimai DX', icon: '🎮' });
-		registerMachine({ id: 'machine-2', name: 'maimai DX', icon: '🕹️' });
-		registerMachine({ id: 'machine-3', name: 'CHUNITHM', icon: '🎯' });
-		registerMachine({ id: 'machine-4', name: 'CHUNITHM', icon: '💻' });
-	});
+// Register demo machines on mount with multi-seat support
+onMount(() => {
+registerMachine({ id: 'machine-1', name: 'maimai DX', icon: '🎵', seats: 2 });
+registerMachine({ id: 'machine-2', name: 'CHUNITHM', icon: '🎹', seats: 2 });
+registerMachine({ id: 'machine-3', name: 'Dance Rush', icon: '💃', seats: 1 });
+registerMachine({ id: 'machine-4', name: 'Sound Voltex', icon: '🎚️', seats: 1 });
+});
 
-	function handleOccupySlot() {
-		if (!slotInput.trim()) {
-			showNotification('Please enter a slot ID (e.g., A3)', 'warning');
-			return;
-		}
+function handleOccupySlot() {
+if (!slotInput.trim()) {
+showNotification('Please enter a slot ID (e.g., A3)', 'warning');
+return;
+}
 
-		if (selectedMachines.length === 0) {
-			showNotification('Please select at least one machine', 'warning');
-			return;
-		}
+if (selectedMachines.length === 0) {
+showNotification('Please select at least one machine', 'warning');
+return;
+}
 
-		const success = occupySlot(slotInput.trim().toUpperCase(), selectedMachines);
-		if (success) {
-			showNotification(`Slot ${slotInput.trim().toUpperCase()} occupied successfully!`, 'success');
-			slotInput = '';
-			selectedMachines = [];
-		} else {
-			showNotification(`Slot ${slotInput.trim().toUpperCase()} is already occupied`, 'error');
-		}
-	}
+// Validate GROUP mode requires partner
+if (sessionMode === 'GROUP' && !partnerSlotInput.trim()) {
+showNotification('GROUP mode requires a partner slot ID', 'warning');
+return;
+}
 
-	function handleReleaseSlot() {
-		if (!slotInput.trim()) {
-			showNotification('Please enter a slot ID to release', 'warning');
-			return;
-		}
+const partner = sessionMode === 'GROUP' ? partnerSlotInput.trim().toUpperCase() : undefined;
+const success = occupySlot(slotInput.trim().toUpperCase(), selectedMachines, sessionMode, partner);
 
-		releaseSlot(slotInput.trim().toUpperCase());
-		showNotification(`Slot ${slotInput.trim().toUpperCase()} released successfully!`, 'success');
-		slotInput = '';
-	}
+if (success) {
+const modeLabel = sessionMode === 'SOLO' ? 'Solo' : sessionMode === 'OPEN' ? 'Open to join' : 'Group';
+showNotification(`Slot ${slotInput.trim().toUpperCase()} joined queue (${modeLabel})!`, 'success');
+slotInput = '';
+partnerSlotInput = '';
+selectedMachines = [];
+showPartnerInput = false;
+} else {
+showNotification(`Failed to occupy slot. It may already be occupied.`, 'error');
+}
+}
 
-	function toggleMachine(machineId: string) {
-		if (selectedMachines.includes(machineId)) {
-			selectedMachines = selectedMachines.filter(id => id !== machineId);
-		} else {
-			selectedMachines = [...selectedMachines, machineId];
-		}
-	}
+function handleReleaseSlot() {
+if (!slotInput.trim()) {
+showNotification('Please enter a slot ID to release', 'warning');
+return;
+}
+
+releaseSlot(slotInput.trim().toUpperCase());
+showNotification(`Slot ${slotInput.trim().toUpperCase()} released successfully!`, 'success');
+slotInput = '';
+}
+
+function toggleMachine(machineId: string) {
+if (selectedMachines.includes(machineId)) {
+selectedMachines = selectedMachines.filter(id => id !== machineId);
+} else {
+selectedMachines = [...selectedMachines, machineId];
+}
+}
+
+function handleSessionModeChange(mode: SessionMode) {
+sessionMode = mode;
+showPartnerInput = mode === 'GROUP';
+}
 </script>
 
 <svelte:head>
-	<title>nearcards</title>
+<title>NearCards Queue Management</title>
 </svelte:head>
 
-<div class="min-h-screen flex flex-col">
-	<Notifications />
-	
-	<!-- Header with gradient -->
-	<header class="bg-linear-to-r from-indigo-600 via-purple-600 to-pink-600 shadow-xl">
-		<div class="max-w-7xl mx-auto px-6 py-8 animate-fade-in">
-			<h1 class="text-5xl font-bold text-white mb-2 flex items-center gap-3">
-				<span class="text-6xl animate-bounce">🎮</span>
-				nearcards
-			</h1>
-			<p class="text-purple-100 text-lg">Self-Service Kiosk Management</p>
-		</div>
-	</header>
+<div class="min-h-screen font-sans">
+<Notifications />
 
-	<main class="flex-1 max-w-7xl w-full mx-auto px-6 py-8">
-		<!-- Control Panel Card -->
-		<div class="bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl p-6 mb-8 border border-white/20">
-			<h2 class="text-3xl font-bold text-white mb-6">Slot Control</h2>
-			
-			<!-- Input Group -->
-			<div class="mb-6">
-				<label for="slot-input" class="block text-sm font-semibold text-gray-200 mb-2">
-					Slot ID
-				</label>
-				<input
-					id="slot-input"
-					type="text"
-					bind:value={slotInput}
-					placeholder="e.g., A3, B5, C1"
-					class="py-3 px-4 block w-full max-w-md bg-white/10 border-2 border-gray-500/30 rounded-lg text-lg text-white placeholder-gray-400 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 transition-all duration-200"
-				/>
-			</div>
+<!-- Header -->
+<div class="navbar bg-primary text-primary-content shadow-xl">
+<div class="flex-1">
+<h1 class="text-3xl font-display ml-4">
+🎮 NearCards
+</h1>
+</div>
+<div class="flex-none">
+<span class="text-sm opacity-80">Kiosk Management System</span>
+</div>
+</div>
 
-			<!-- Machine Selection -->
-			<div class="mb-6">
-				<span class="block text-sm font-semibold text-gray-200 mb-3">Select Machine(s)</span>
-				<div class="flex flex-wrap gap-3">
-					{#each $machines as machine}
-						<button
-							type="button"
-							on:click={() => toggleMachine(machine.id)}
-							class="py-3 px-6 inline-flex items-center gap-3 rounded-xl text-base font-semibold transition-all duration-200 {selectedMachines.includes(machine.id)
-								? 'bg-linear-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/50 scale-105'
-								: 'bg-white/10 border-2 border-gray-500/30 text-white hover:bg-white/20 hover:scale-105'}"
-						>
-							<span class="text-2xl">{machine.icon}</span>
-							<span>{machine.name}</span>
-						</button>
-					{/each}
-				</div>
-			</div>
+<main class="container mx-auto px-4 py-8 max-w-7xl">
+<!-- Control Panel -->
+<div class="card bg-base-300 shadow-2xl mb-8">
+<div class="card-body">
+<h2 class="card-title text-3xl font-sans mb-4">Slot Control</h2>
 
-			<!-- Action Buttons -->
-			<div class="flex flex-wrap gap-3">
-				<button
-					type="button"
-					on:click={handleOccupySlot}
-					class="py-3 px-8 inline-flex justify-center items-center gap-2 rounded-xl bg-linear-to-r from-purple-600 to-indigo-600 text-white text-lg font-semibold hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-4 focus:ring-purple-500/50 transition-all duration-200 shadow-lg hover:scale-105"
-				>
-					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-					</svg>
-					Occupy Slot
-				</button>
-				<button
-					type="button"
-					on:click={handleReleaseSlot}
-					class="py-3 px-8 inline-flex justify-center items-center gap-2 rounded-xl bg-linear-to-r from-red-600 to-pink-600 text-white text-lg font-semibold hover:from-red-700 hover:to-pink-700 focus:outline-none focus:ring-4 focus:ring-red-500/50 transition-all duration-200 shadow-lg hover:scale-105"
-				>
-					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-					</svg>
-					Release Slot
-				</button>
-			</div>
-		</div>
+<!-- Slot ID Input -->
+<div class="form-control w-full max-w-md">
+<label class="label" for="slot-input">
+<span class="label-text font-semibold">Slot ID</span>
+</label>
+<input
+id="slot-input"
+type="text"
+bind:value={slotInput}
+placeholder="e.g., A3, B5, C1"
+class="input input-bordered input-primary w-full font-sans text-lg"
+/>
+</div>
 
-		<!-- Queue Display -->
-		<div class="animate-fade-in-up">
-			<h2 class="text-3xl font-bold text-white mb-6">Active Queues</h2>
-			
-			{#if $machines.length === 0}
-				<div class="bg-white/5 backdrop-blur rounded-2xl p-12 text-center border border-white/10">
-					<p class="text-gray-400 text-lg">No machines registered yet.</p>
-				</div>
-			{:else}
-				<div class="space-y-4">
-					{#each $machines as machine}
-						{@const queue = $queues.find(q => q.machineId === machine.id)}
-						{#if queue}
-							<MachineRow {machine} {queue} />
-						{/if}
-					{/each}
-				</div>
-			{/if}
-		</div>
-	</main>
+<!-- Session Mode Selection -->
+<div class="form-control w-full mt-4">
+<label class="label">
+<span class="label-text font-semibold">Session Preference</span>
+</label>
+<div class="btn-group">
+<button
+class="btn {sessionMode === 'SOLO' ? 'btn-active btn-primary' : 'btn-ghost'}"
+on:click={() => handleSessionModeChange('SOLO')}
+>
+🔒 Solo
+</button>
+<button
+class="btn {sessionMode === 'OPEN' ? 'btn-active btn-primary' : 'btn-ghost'}"
+on:click={() => handleSessionModeChange('OPEN')}
+>
+🤝 Open to Join
+</button>
+<button
+class="btn {sessionMode === 'GROUP' ? 'btn-active btn-primary' : 'btn-ghost'}"
+on:click={() => handleSessionModeChange('GROUP')}
+>
+👥 Bring Friend
+</button>
+</div>
+<label class="label">
+<span class="label-text-alt">
+{#if sessionMode === 'SOLO'}
+Play alone, blocking other seats
+{:else if sessionMode === 'OPEN'}
+Others can join your session
+{:else}
+Play with a specific friend
+{/if}
+</span>
+</label>
+</div>
+
+<!-- Partner Input (for GROUP mode) -->
+{#if showPartnerInput}
+<div class="form-control w-full max-w-md mt-4">
+<label class="label" for="partner-input">
+<span class="label-text font-semibold">Partner's Slot ID</span>
+</label>
+<input
+id="partner-input"
+type="text"
+bind:value={partnerSlotInput}
+placeholder="e.g., B7"
+class="input input-bordered input-secondary w-full font-sans text-lg"
+/>
+</div>
+{/if}
+
+<!-- Machine Selection -->
+<div class="form-control w-full mt-6">
+<label class="label">
+<span class="label-text font-semibold">Select Machine(s)</span>
+</label>
+<div class="flex flex-wrap gap-3">
+{#each $machines as machine}
+<button
+class="btn btn-lg {selectedMachines.includes(machine.id) ? 'btn-primary' : 'btn-outline'}"
+on:click={() => toggleMachine(machine.id)}
+>
+<span class="text-2xl mr-2">{machine.icon}</span>
+<div class="text-left">
+<div class="font-semibold">{machine.name}</div>
+{#if machine.seats > 1}
+<div class="text-xs opacity-70">{machine.seats} seats</div>
+{/if}
+</div>
+</button>
+{/each}
+</div>
+</div>
+
+<!-- Action Buttons -->
+<div class="card-actions justify-end mt-6">
+<button class="btn btn-success btn-lg gap-2" on:click={handleOccupySlot}>
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+</svg>
+Join Queue
+</button>
+<button class="btn btn-error btn-lg gap-2" on:click={handleReleaseSlot}>
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+</svg>
+Leave Queue
+</button>
+</div>
+</div>
+</div>
+
+<!-- Queue Display -->
+<div class="space-y-6">
+<h2 class="text-4xl font-sans font-bold">Active Queues</h2>
+
+{#if $machines.length === 0}
+<div class="alert shadow-lg">
+<div>
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-info flex-shrink-0 w-6 h-6">
+<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+</svg>
+<span>No machines registered yet.</span>
+</div>
+</div>
+{:else}
+{#each $machines as machine}
+{@const queue = $queues.find(q => q.machineId === machine.id)}
+{#if queue}
+<MachineRow {machine} {queue} />
+{/if}
+{/each}
+{/if}
+</div>
+</main>
+
+<!-- Footer -->
+<footer class="footer footer-center p-4 bg-base-300 text-base-content mt-8">
+<div>
+<p class="font-sans text-sm opacity-70">
+💡 Long press on active session to re-queue | Double-click session to edit mode
+</p>
+</div>
+</footer>
 </div>
 
 <style>
-	@keyframes fade-in {
-		from {
-			opacity: 0;
-			transform: translateY(-10px);
-		}
-		to {
-			opacity: 1;
-			transform: translateY(0);
-		}
-	}
+:global(body) {
+font-family: 'Orbitron', system-ui, sans-serif;
+}
 
-	@keyframes fade-in-up {
-		from {
-			opacity: 0;
-			transform: translateY(20px);
-		}
-		to {
-			opacity: 1;
-			transform: translateY(0);
-		}
-	}
+:global(.font-display) {
+font-family: 'Press Start 2P', cursive;
+}
 
-	.animate-fade-in {
-		animation: fade-in 0.5s ease-out;
-	}
-
-	.animate-fade-in-up {
-		animation: fade-in-up 0.7s ease-out;
-	}
+:global(.font-sans) {
+font-family: 'Orbitron', system-ui, sans-serif;
+}
 </style>
