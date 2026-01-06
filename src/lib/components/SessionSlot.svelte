@@ -64,8 +64,9 @@
   }
 </script>
 
+<!-- svelte-ignore a11y_click_events_have_key_events -->
 <div
-  class="relative flex flex-col items-center justify-center min-w-28 h-28 rounded-xl cursor-pointer select-none transition-all duration-300 bg-gradient-to-br {getModeColor(
+  class="relative flex flex-col items-center justify-center min-w-28 h-28 rounded-xl cursor-pointer select-none transition-all duration-300 bg-linear-to-br {getModeColor(
     session.mode
   )} {session.status === 'ACTIVE'
     ? 'shadow-lg animate-pulse-playing ring-2 ring-white ring-opacity-50'

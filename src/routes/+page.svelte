@@ -164,6 +164,7 @@
 
         <!-- Session Mode Selection -->
         <div class="form-control w-full mt-4">
+          <!-- svelte-ignore a11y_label_has_associated_control -->
           <label class="label">
             <span class="label-text font-semibold">Session Preference</span>
           </label>
@@ -193,6 +194,7 @@
               👥 Bring Friend
             </button>
           </div>
+          <!-- svelte-ignore a11y_label_has_associated_control -->
           <label class="label">
             <span class="label-text-alt">
               {#if sessionMode === "SOLO"}
@@ -224,6 +226,7 @@
 
         <!-- Machine Selection -->
         <div class="form-control w-full mt-6">
+          <!-- svelte-ignore a11y_label_has_associated_control -->
           <label class="label">
             <span class="label-text font-semibold">Select Machine(s)</span>
           </label>
@@ -302,7 +305,7 @@
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
-              class="stroke-info flex-shrink-0 w-6 h-6"
+              class="stroke-info shrink-0 w-6 h-6"
             >
               <path
                 stroke-linecap="round"
